@@ -95,7 +95,9 @@ public class Main {
 
         try {
 
-            PreparedStatement ps = db.prepareStatement(UPDATE)
+            PreparedStatement ps = db.prepareStatement(UPDATE);
+        }  catch (SQLException exception) {
+            System.out.println("Database errorL " + exception.getMessage());
         }
 
 
