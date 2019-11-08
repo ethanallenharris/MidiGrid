@@ -4,6 +4,19 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static void openDatabase(String dbFile) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            SQLiteConfig config = new SQLiteConfig();
+            config.enforceForeignKeys(true);
+            db = DriverManager.getConnection("jdbc:sqlite:resources/" + dbFile, config.toProperties());
+            System.out.println("Database connection successfully established.");
+        } catch (Exception exception) {
+            System.out.println("Database connection error: " + exception.getMessage());
+        }
+
+    }
+
     public static Connection db = null;
 
     public static void main(String[] args) {
@@ -61,18 +74,7 @@ public class Main {
         }
     }
 
-    private static void openDatabase(String dbFile) {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            SQLiteConfig config = new SQLiteConfig();
-            config.enforceForeignKeys(true);
-            db = DriverManager.getConnection("jdbc:sqlite:resources/" + dbFile, config.toProperties());
-            System.out.println("Database connection successfully established.");
-        } catch (Exception exception) {
-            System.out.println("Database connection error: " + exception.getMessage());
-        }
 
-    }
 
     private static void closeDatabase() {
         try {
@@ -106,10 +108,10 @@ public class Main {
     public static void createUser() {
         try {
             PreparedStatement ps = db.prepareStatement("INSERT INTO Users (UserID, UserName, Password) VALUES (?, ?, ?)");
-            ps.setString(2, "hAPPYjOE");
-            ps.setString(3, "Beans");
+            ps.setString(2, "Anonymous");
+            ps.setString(3, "123456789");
             ps.executeUpdate();
-            System.out.println("Record added to UsersAndPasswords table");
+            System.out.println("Record added to 'Users' table");
 
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
