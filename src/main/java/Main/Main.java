@@ -8,12 +8,12 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static void openDatabase(String dbFile) {
+    private static void openDatabase() {
         try {
             Class.forName("org.sqlite.JDBC");
             SQLiteConfig config = new SQLiteConfig();
             config.enforceForeignKeys(true);
-            db = DriverManager.getConnection("jdbc:sqlite:resources/" + dbFile, config.toProperties());
+            db = DriverManager.getConnection("jdbc:sqlite:resources/" + "DatabaseSQLite.db", config.toProperties());
             System.out.println("Database connection successfully established.");
         } catch (Exception exception) {
             System.out.println("Database connection error: " + exception.getMessage());
@@ -32,12 +32,12 @@ public class Main {
     public static Connection db = null;
 
     public static void main(String[] args) {
-        openDatabase("DatabaseSQLite.db");
+        openDatabase();
         Scanner input = new Scanner(System.in);
         String decision = "";
         Boolean successful = false;
 // code to get data from, write to the database etc goes here!
-        while (decision != "exit") {
+        while (!decision.equals("exit")) {
             successful = false;
             System.out.println("Please choose an option");
             System.out.println("1 - Create a new user");
@@ -51,10 +51,9 @@ public class Main {
             System.out.println("9 - Delete User");
             System.out.println("10 - List songs");
             System.out.println("exit - exits the menu");
-            while (successful != true) {
+            while (!successful) {
                 System.out.println("Please enter your choice");
                 decision = input.nextLine();
-                System.out.println(decision);
                 switch (decision) {
                     case "1":
                         Users.createUser();
@@ -77,7 +76,7 @@ public class Main {
                         successful = true;
                         break;
                     case "6":
-                        Songs.deleteSong();
+                        Songs.deleteSong(2);
                         successful = true;
                         break;
                     case "7":
@@ -92,8 +91,12 @@ public class Main {
                         Users.deleteUser();
                         successful = true;
                         break;
+                    case "10":
+                        Songs.listSongs();
+                        successful = true;
+                        break;
                     case "exit":
-                        successful = false;
+                        successful = true;
                         break;
                     default:
                         System.out.println("Data entered is wrong, please try again");
@@ -101,6 +104,8 @@ public class Main {
                 }
             }
         }
+        closeDatabase();
+        System.out.println("TEST");
     }
 
 

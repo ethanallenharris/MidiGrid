@@ -29,9 +29,10 @@ public class Users {
 
     public static void createUser() {
         try {
-            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Users (UserID, UserName, Password) VALUES (?, ?, ?)");
-            ps.setString(2, "Anonymous");
-            ps.setString(3, "123456789");
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Users (UserName, Password, Admin) VALUES (?, ?, ?)");
+            ps.setString(1, "Anonymous");
+            ps.setString(2, "123456789");
+            ps.setBoolean(3, false);
             ps.executeUpdate();
             System.out.println("Record added to 'Users' table");
 
