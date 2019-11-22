@@ -8,12 +8,14 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static void openDatabase() {
-        try {
+public static Connection db = null;
+
+    private static void openDatabase(String dbFile) {
+        try  {
             Class.forName("org.sqlite.JDBC");
             SQLiteConfig config = new SQLiteConfig();
             config.enforceForeignKeys(true);
-            db = DriverManager.getConnection("jdbc:sqlite:resources/" + "DatabaseSQLite.db", config.toProperties());
+            db = DriverManager.getConnection("jdbc:sqlite:resources/" + dbFile, config.toProperties());
             System.out.println("Database connection successfully established.");
         } catch (Exception exception) {
             System.out.println("Database connection error: " + exception.getMessage());
@@ -29,10 +31,9 @@ public class Main {
             System.out.println("Database disconnection error: " + exception.getMessage());
         }
     }
-    public static Connection db = null;
 
     public static void main(String[] args) {
-        openDatabase();
+        openDatabase("DatabaseSQLite.db");
         Scanner input = new Scanner(System.in);
         String decision = "";
         Boolean successful = false;
@@ -72,7 +73,7 @@ public class Main {
                         successful = true;
                         break;
                     case "5":
-                        Songs.saveSong();
+                        Songs.saveSong(1, 1, "99 bottles", "984535894845");
                         successful = true;
                         break;
                     case "6":
@@ -84,7 +85,7 @@ public class Main {
                         successful = true;
                         break;
                     case "8":
-                        Songs.renameSong();
+                        //Songs.renameSong();
                         successful = true;
                         break;
                     case "9":

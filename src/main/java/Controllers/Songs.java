@@ -7,14 +7,18 @@ import java.sql.ResultSet;
 
 public class Songs {
 
-    public static void saveSong() {
-        try {
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = 1");
-            ps.setInt(1,2);
-            ps.setString(2, "Sausage");
-            ps.setString(3, "984535894845");
 
-            ps.execute();
+
+
+    public static void saveSong(int SongID, int UserID, String SongName, String SongContents) {
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = ?");
+            ps.setInt(1, UserID);
+            ps.setString(2, SongName);
+            ps.setString(3, SongContents);
+            ps.setInt(4, SongID);
+
+            ps.executeUpdate();
             System.out.println("Update successful");
         } catch (Exception exception){
             System.out.println("Database error:"+ exception.getMessage());
@@ -46,14 +50,14 @@ public class Songs {
         }
     }
 
-    public static void renameSong() {
-        try {
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET SongName WHERE SongID = 3");
-            ps.setString(3, "Spinning");
-        } catch (Exception exception) {
-            System.out.println("Database error:" + exception.getMessage());
-        }
-    }
+  //  public static void renameSong() {
+  //      try {
+  //          PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET SongName WHERE SongID = 3");
+  //          ps.setString(3, "Spinning");
+  //      } catch (Exception exception) {
+  //          System.out.println("Database error:" + exception.getMessage());
+  //      }
+ //   }
 
     public static void listSongs() {
         try {
