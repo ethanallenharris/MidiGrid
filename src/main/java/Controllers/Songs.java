@@ -39,10 +39,10 @@ public class Songs {
 
     public static void createSong() {
         try {
-            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO songs (SongID, UserID, SongName, SongContents)");
-            ps.setInt(2, 2);
-            ps.setString(3, "Wood Tables");
-            ps.setString(4, "35840483058");
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Songs (UserID, SongName, SongContents) VALUES ( ?, ?, ?)");
+            ps.setInt(1, 2);
+            ps.setString(2, "Wood Tables");
+            ps.setString(3, "35840483058");
 
             ps.executeUpdate();
         } catch (Exception exception) {
@@ -50,14 +50,17 @@ public class Songs {
         }
     }
 
-  //  public static void renameSong() {
-  //      try {
-  //          PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET SongName WHERE SongID = 3");
-  //          ps.setString(3, "Spinning");
-  //      } catch (Exception exception) {
-  //          System.out.println("Database error:" + exception.getMessage());
-  //      }
- //   }
+    public static void renameSong() {
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET SongName = ? WHERE (SongID = 3)");
+            ps.setString(1, "Spinning");
+
+            ps.executeUpdate();
+            System.out.println("Song successfully renamed");
+        } catch (Exception exception) {
+            System.out.println("Database error:" + exception.getMessage());
+     }
+    }
 
     public static void listSongs() {
         try {

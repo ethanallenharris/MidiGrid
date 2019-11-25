@@ -77,7 +77,7 @@ public static Connection db = null;
                         successful = true;
                         break;
                     case "6":
-                        Songs.deleteSong(2);
+                        Songs.deleteSong(4);
                         successful = true;
                         break;
                     case "7":
@@ -85,7 +85,7 @@ public static Connection db = null;
                         successful = true;
                         break;
                     case "8":
-                        //Songs.renameSong();
+                        Songs.renameSong();
                         successful = true;
                         break;
                     case "9":

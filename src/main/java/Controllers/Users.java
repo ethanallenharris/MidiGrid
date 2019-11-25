@@ -64,7 +64,7 @@ public class Users {
     public static void deleteUser() {
         try {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Users WHERE UserID = ?");
-            ps.setInt(1, 8);
+            ps.setInt(1, 5);
 
             ps.execute();
             System.out.println("Deletion successful");
