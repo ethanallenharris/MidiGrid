@@ -1,14 +1,44 @@
 package Controllers;
 
-import Main.Main;
+import org.json.simple.JSONArray;
+import server.Main;
 
+import javax.annotation.PostConstruct;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+
+
+
+
+@Path("Songs")
 public class Songs {
+        @POST
+        @Path("list")
+        @Produces(MediaType.APPLICATION_JSON)
+        public String saveSong() {
+            System.out.println("Songs/Save");
+            JSONArray list new = JSONArray();
+            try {
+                PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = ?");
+                ps.setInt(1, UserID);
+                ps.setString(2, SongName);
+                ps.setString(3, SongContents);
+                ps.setInt(4, SongID);
 
-
-
+                ps.executeUpdate();
+                System.out.println("Update successful");
+                return list.toString();
+            } catch (Exception exception){
+                System.out.println("Database error:"+ exception.getMessage());
+                return "{"error": \"Unable to save song, please see server console for more info.\"}";
+            }
+        }
+}
 
     public static void saveSong(int SongID, int UserID, String SongName, String SongContents) {
         try {
@@ -59,7 +89,7 @@ public class Songs {
             System.out.println("Song successfully renamed");
         } catch (Exception exception) {
             System.out.println("Database error:" + exception.getMessage());
-     }
+        }
     }
 
     public static void listSongs() {

@@ -1,6 +1,6 @@
 package Controllers;
 
-import Main.Main;
+import server.Main;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,7 +38,7 @@ public class Users {
 
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
-            System.out.println("Error: Something has gone wrong. Please contact the administrator with the error code WC-WA.");
+            System.out.println("Error: Something has gone wrong, Error message: " + exception.getMessage());
         }
     }
 
