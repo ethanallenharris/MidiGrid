@@ -18,7 +18,7 @@ import java.sql.ResultSet;
 
 
 
-@Path("Songs")
+@Path("song")
 public class Songs {
         @POST
         @Path("update")
