@@ -1,6 +1,6 @@
 package Controllers;
 
-import com.sun.jersey.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.simple.JSONArray;
 import server.Main;
 
