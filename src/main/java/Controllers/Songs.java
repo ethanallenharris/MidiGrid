@@ -1,9 +1,12 @@
 package Controllers;
 
+import com.sun.jersey.multipart.FormDataParam;
 import org.json.simple.JSONArray;
 import server.Main;
 
 import javax.annotation.PostConstruct;
+import javax.print.attribute.standard.Media;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -18,25 +21,26 @@ import java.sql.ResultSet;
 @Path("Songs")
 public class Songs {
         @POST
-        @Path("list")
+        @Path("update")
+        @Consumes(MediaType.MULTIPART_FORM_DATA)
         @Produces(MediaType.APPLICATION_JSON)
-        public String saveSong() {
-            System.out.println("Songs/Save");
-            JSONArray list new = JSONArray();
+        public String saveSong(@FormDataParam("UserID") int UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents, @FormDataParam("SongID") int SongID) {
             try {
+                if ( SongID > 0 || UserID > 0  || SongName == null || SongContents == null) {
+                    throw new Exception("One or more form data parameters are missing in the HTTP request");
+                }
+                System.out.println("song/save");
+
                 PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = ?");
                 ps.setInt(1, UserID);
                 ps.setString(2, SongName);
                 ps.setString(3, SongContents);
                 ps.setInt(4, SongID);
-
                 ps.executeUpdate();
-                System.out.println("Update successful");
-                return list.toString();
-            } catch (Exception exception){
-                System.out.println("Database error:"+ exception.getMessage());
-                return "{"error": \"Unable to save song, please see server console for more info.\"}";
-            }
+                return "{\"Status\": \"OK\"}";
+            } catch (Exception exception) {
+                System.out.println("Database error: " + exception.getMessage());
+                return "{\"Error\": \"Unable to Update song\"}";
         }
 }
 

@@ -2,6 +2,12 @@ package server;
 
 import Controllers.Songs;
 import Controllers.Users;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.sqlite.SQLiteConfig;
 import java.sql.*;
 import java.util.Scanner;
@@ -56,7 +62,6 @@ public static Connection db = null;
         Scanner input = new Scanner(System.in);
         String decision = "";
         Boolean successful = false;
-// code to get data from, write to the database etc goes here!
         while (!decision.equals("exit")) {
             successful = false;
             System.out.println("Please choose an option");
