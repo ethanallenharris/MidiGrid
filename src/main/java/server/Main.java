@@ -76,7 +76,7 @@ public static Connection db = null;
             System.out.println("9 - Delete User");
             System.out.println("10 - List songs");
             System.out.println("exit - exits the menu");
-            while (!successful) {
+            /*while (!successful) {
                 System.out.println("Please enter your choice");
                 decision = input.nextLine();
                 switch (decision) {
@@ -127,7 +127,7 @@ public static Connection db = null;
                         System.out.println("Data entered is wrong, please try again");
                         break;
                 }
-            }
+            }*/
         }
         closeDatabase();
         System.out.println("TEST");

@@ -18,31 +18,59 @@ import java.sql.ResultSet;
 
 
 
-@Path("song")
+@Path("/song/")
 public class Songs {
-        @POST
-        @Path("update")
-        @Consumes(MediaType.MULTIPART_FORM_DATA)
-        @Produces(MediaType.APPLICATION_JSON)
-        public String saveSong(@FormDataParam("UserID") int UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents, @FormDataParam("SongID") int SongID) {
-            try {
-                if ( SongID > 0 || UserID > 0  || SongName == null || SongContents == null) {
-                    throw new Exception("One or more form data parameters are missing in the HTTP request");
-                }
-                System.out.println("song/save");
+    @POST
+    @Path("update")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String saveSong(@FormDataParam("UserID") int UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents, @FormDataParam("SongID") int SongID) {
+        try {
+            if (SongID > 0 || UserID > 0 || SongName == null || SongContents == null) {
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            System.out.println("song/save");
 
-                PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = ?");
-                ps.setInt(1, UserID);
-                ps.setString(2, SongName);
-                ps.setString(3, SongContents);
-                ps.setInt(4, SongID);
-                ps.executeUpdate();
-                return "{\"Status\": \"OK\"}";
-            } catch (Exception exception) {
-                System.out.println("Database error: " + exception.getMessage());
-                return "{\"Error\": \"Unable to Update song\"}";
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = ?");
+            ps.setInt(1, UserID);
+            ps.setString(2, SongName);
+            ps.setString(3, SongContents);
+            ps.setInt(4, SongID);
+            ps.executeUpdate();
+            return "{\"Status\": \"OK\"}";
+        } catch (Exception exception) {
+            System.out.println("Database error: " + exception.getMessage());
+            return "{\"Error\": \"Unable to Update song\"}";
         }
-}
+    }
+
+    @POST
+    @Path("newSong")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String insertThing(@FormDataParam("UserID") int UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents) {
+        try {
+            if (UserID > 0 || SongName == null || SongContents == null) {
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Songs (UserID, SongName, SongContents) VALUES ( ?, ?, ?)");
+            ps.setInt(1, UserID);
+            ps.setString(2, SongName);
+            ps.setString(3, SongContents);
+
+            ps.execute();
+            return "{\"Status\": \"OK\"}";
+
+        } catch (Exception exception) {
+            System.out.println("Database error:" + exception.getMessage());
+            return "{\"Error\": \"Unable to Save song\"}";
+        }
+    }
+
+
+
+
+
 
     public static void saveSong(int SongID, int UserID, String SongName, String SongContents) {
         try {
