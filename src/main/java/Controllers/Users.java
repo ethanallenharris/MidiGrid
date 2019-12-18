@@ -13,26 +13,27 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@Path("/User/")
+@Path("/user/")
 public class Users {
     @GET
     @Path("select")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String selectUser(@FormDataParam("Username")String UserName) {
-        JSONArray CurrentUser = new JSONArray();
+    public static String selectUser(@FormDataParam("Username")String UserName) throws Exception {
+        if (UserName == null) {
+            throw new Exception("Users 'UserName' is missing in the HTTP requests URL");
+        }
+        JSONObject item = new JSONObject();
         try {
             PreparedStatement ps = Main.db.prepareStatement("SELECT UserID, UserName, Password FROM Users WHERE UserName=?");
-            ps.setString(1,UserName);
+
+            ps.setString(1, UserName);
             ResultSet results = ps.executeQuery();
-
-            results
-            JSONObject user = new JSONObject();
-            user.put("UserID",results.getInt(1));
-            user.put("Username", results.getString(2));
-            user.put("Password", results.getString(3));
-            CurrentUser.add(user);
-            return CurrentUser.toString();
-
+            if (results.next()) {
+                item.put("UserID",results.getInt(1));
+                item.put("Username", results.getString(2));
+                item.put("Password", results.getString(3));
+            }
+            return item.toString();
 
         } catch (Exception exception) {
             System.out.println("Database error: " + exception.getMessage());
@@ -73,7 +74,7 @@ public class Users {
             ResultSet results = ps.executeQuery();
             while (results.next()) {
                 JSONObject user = new JSONObject();
-                user.put("userID",results.getInt(1));
+                user.put("UserID",results.getInt(1));
                 user.put("Username", results.getString(2));
                 user.put("Password", results.getString(3));
                 users.add(user);
