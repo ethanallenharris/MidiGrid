@@ -64,7 +64,7 @@ public class Users {
     }
 
     @GET
-    @Path("list")
+    @Path("allUsers")
     @Produces(MediaType.APPLICATION_JSON)
     public static String listUser() {
         try {
@@ -100,7 +100,141 @@ public class Users {
             System.out.println("Deletion successful");
         } catch (SQLException exception) {
             System.out.println("Database error " + exception.getMessage());
+
         }
     }
+
+    @GET
+    @Path("list")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String listSongs() {
+        System.out.println("user/list");
+        JSONArray list = new JSONArray();
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("SELECT SongName FROM Songs WHERE UserID = ?");
+            ResultSet results = ps.executeQuery();
+            while (results.next()) {
+                JSONObject item = new JSONObject();
+                item.put("SongName: " , results.getString(1));
+                list.add(item);
+            }
+
+            return list.toString();
+
+        } catch (SQLException exception) {
+            System.out.println(("Database error " + exception.getMessage()));
+            return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
+        }
+    }
+
+    @GET
+    @Path("list/load/{SongID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String loadSong(@PathParam("SongID") Integer SongID) {
+        System.out.println("list/load/" + SongID);
+        JSONObject item = new JSONObject();
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("SELECT SongContents, SongName FROM Songs WHERE SongID = ?");
+            ps.setInt(1, SongID);
+            ResultSet results = ps.executeQuery();
+            if (results.next()) {
+                item.put("id", SongID);
+                item.put("SongContents", results.getString(1));
+                item.put("SongName", results.getInt(2));
+            }
+            return item.toString();
+        } catch (Exception exception) {
+            System.out.println("Database error: " + exception.getMessage());
+            return "{\"error\": \"Unable to get Song, please see server console for more info.\"}";
+        }
+    }
+
+
+    @POST
+    @Path("list/rename/{SongID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public static void renameSong(@PathParam("SongID") Integer SongID, @FormDataParam("SongName") String SongName) {
+        System.out.println("list/rename/" + SongID);
+        JSONObject item = new JSONObject();
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET SongName = ? WHERE SongID = ?");
+                ps.setString(1, SongName);
+                ps.setInt(2, SongID);
+            }
+
+        catch (Exception exception) {
+            System.out.println("Database error: " + exception.getMessage());
+        }
+    }
+
+    @POST
+    @Path("list/delete/{SongID}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public static void deleteUser(@PathParam("SongID") Integer SongID) {
+        System.out.println("list/delete/" + SongID);
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Songs WHERE SongID = ?");
+            ps.setInt(1, SongID);
+
+            ps.execute();
+            System.out.println("Deletion successful");
+        } catch (SQLException exception) {
+            System.out.println("Database error " + exception.getMessage());
+
+        }
+    }
+
+
+    //This is the Login API but I don't know how to do it yet
+    /*@POST
+    @Path("login")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String loginUser(@FormDataParam("UserName") String username, @FormDataParam("Password") String password) {
+
+        try {
+
+            PreparedStatement ps1 = Main.db.prepareStatement("SELECT Password FROM Users WHERE Username = ?");
+            ps1.setString(1, username);
+            ResultSet loginResults = ps1.executeQuery();
+            if (loginResults.next()) {
+
+                String correctPassword = loginResults.getString(1);
+
+                if (password.equals(correctPassword)) {
+
+                    String token = UUID.randomUUID().toString();
+
+                    PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Users SET Token = ? WHERE Username = ?");
+                    ps2.setString(1, token);
+                    ps2.setString(2, username);
+                    ps2.executeUpdate();
+
+                    return "{\"token\": \""+ token + "\"}";
+
+                } else {
+
+                    return "{\"error\": \"Incorrect password\"}";
+
+                }
+
+            } else {
+
+                return "{\"error\": \"Unknown user\"}";
+
+            }
+
+        }catch (Exception exception){
+            System.out.println("Database error during /user/login: " + exception.getMessage());
+            return "{\"error\": \"Server side error, please see server console for more info\"}";
+        }
+
+
+    }*/
+
+
+
+
 
 }

@@ -21,7 +21,7 @@ import java.sql.ResultSet;
 @Path("/song/")
 public class Songs {
     @POST
-    @Path("update")
+    @Path("save")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public String saveSong(@FormDataParam("UserID") int UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents, @FormDataParam("SongID") int SongID) {
