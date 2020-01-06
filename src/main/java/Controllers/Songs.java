@@ -24,9 +24,9 @@ public class Songs {
     @Path("save")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String saveSong(@FormDataParam("UserID") int UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents, @FormDataParam("SongID") int SongID) {
+    public String saveSong(@FormDataParam("UserID") Integer UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents, @FormDataParam("SongID") Integer SongID) {
         try {
-            if (SongID > 0 || UserID > 0 || SongName == null || SongContents == null) {
+            if (SongID == 0 || UserID == 0 || SongName == null || SongContents == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             System.out.println("song/save");
@@ -48,9 +48,9 @@ public class Songs {
     @Path("newSong")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String insertThing(@FormDataParam("UserID") int UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents) {
+    public String newSong(@FormDataParam("UserID") Integer UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents) {
         try {
-            if (UserID > 0 || SongName == null || SongContents == null) {
+            if (UserID == 0 || SongName == null || SongContents == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Songs (UserID, SongName, SongContents) VALUES ( ?, ?, ?)");
@@ -72,7 +72,7 @@ public class Songs {
 
 
 
-    public static void saveSong(int SongID, int UserID, String SongName, String SongContents) {
+    public static void saveSong(Integer SongID, Integer UserID, String SongName, String SongContents) {
         try {
             PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = ?");
             ps.setInt(1, UserID);
@@ -87,7 +87,7 @@ public class Songs {
         }
     }
 
-    public static void deleteSong(int SongID) {
+    public static void deleteSong(Integer SongID) {
         try {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Songs WHERE SongID = ?");
             ps.setInt(1, SongID);

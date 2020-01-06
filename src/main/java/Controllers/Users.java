@@ -18,7 +18,7 @@ public class Users {
     @GET
     @Path("select")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String selectUser(@FormDataParam("Username")String UserName) throws Exception {
+    public static String selectUser(@FormDataParam("Username") String UserName) throws Exception {
         if (UserName == null) {
             throw new Exception("Users 'UserName' is missing in the HTTP requests URL");
         }
@@ -107,7 +107,7 @@ public class Users {
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listSongs() {
+    public String listSongs(@FormDataParam("UserID") Integer UserID) {
         System.out.println("user/list");
         JSONArray list = new JSONArray();
         try {
