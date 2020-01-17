@@ -93,7 +93,7 @@ public class Users {
     @Produces(MediaType.APPLICATION_JSON)
     public static void deleteUser() {
         try {
-            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Users WHERE UserID = ?");
+            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Users WHERE UserID =?");
             ps.setInt(1, 5);
 
             ps.execute();
@@ -104,45 +104,47 @@ public class Users {
         }
     }
 
-    @GET
+    @POST
     @Path("list")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public String listSongs(@FormDataParam("UserID") Integer UserID) {
-        System.out.println("user/list");
-        JSONArray list = new JSONArray();
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT SongName FROM Songs WHERE UserID = ?");
+            JSONArray Songs = new JSONArray();
+            PreparedStatement ps = Main.db.prepareStatement("SELECT SongName FROM Songs WHERE UserID=?");
+            ps.setInt(1,UserID);
             ResultSet results = ps.executeQuery();
             while (results.next()) {
                 JSONObject item = new JSONObject();
-                item.put("SongName: " , results.getString(1));
-                list.add(item);
+                item.put("SongName", results.getString(1));
+                Songs.add(item);
             }
-
-            return list.toString();
-
-        } catch (SQLException exception) {
-            System.out.println(("Database error " + exception.getMessage()));
+            return Songs.toString();
+        } catch (Exception exception) {
+            System.out.println("Database error: " + exception.getMessage());
             return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
         }
     }
+
 
     @GET
     @Path("list/load/{SongID}")
     @Produces(MediaType.APPLICATION_JSON)
     public String loadSong(@PathParam("SongID") Integer SongID) {
         System.out.println("list/load/" + SongID);
-        JSONObject item = new JSONObject();
+        JSONArray Song = new JSONArray();
         try {
             PreparedStatement ps = Main.db.prepareStatement("SELECT SongContents, SongName FROM Songs WHERE SongID = ?");
             ps.setInt(1, SongID);
             ResultSet results = ps.executeQuery();
             if (results.next()) {
+                JSONObject item = new JSONObject();
                 item.put("id", SongID);
                 item.put("SongContents", results.getString(1));
                 item.put("SongName", results.getInt(2));
+                Song.add(item);
             }
-            return item.toString();
+            return Song.toString();
         } catch (Exception exception) {
             System.out.println("Database error: " + exception.getMessage());
             return "{\"error\": \"Unable to get Song, please see server console for more info.\"}";
@@ -158,10 +160,10 @@ public class Users {
         JSONObject item = new JSONObject();
         try {
             PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET SongName = ? WHERE SongID = ?");
-                ps.setString(1, SongName);
-                ps.setInt(2, SongID);
-            }
-
+            ps.setString(1, SongName);
+            ps.setInt(2, SongID);
+            System.out.println("Song successfully renamed to: " + SongName);
+        }
         catch (Exception exception) {
             System.out.println("Database error: " + exception.getMessage());
         }
