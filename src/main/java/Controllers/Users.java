@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @Path("/user/")
 public class Users {
@@ -130,24 +131,25 @@ public class Users {
     @GET
     @Path("list/load/{SongID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String loadSong(@PathParam("SongID") Integer SongID) {
+    public String getThing(@PathParam("SongID") Integer SongID) throws Exception {
+        if (SongID == null) {
+            throw new Exception("Songs's 'SongID' is missing in the HTTP request's URL.");
+        }
         System.out.println("list/load/" + SongID);
-        JSONArray Song = new JSONArray();
+        JSONObject item = new JSONObject();
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT SongContents, SongName FROM Songs WHERE SongID = ?");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT SongName, SongContents FROM Songs WHERE SongID = ?");
             ps.setInt(1, SongID);
             ResultSet results = ps.executeQuery();
             if (results.next()) {
-                JSONObject item = new JSONObject();
-                item.put("id", SongID);
-                item.put("SongContents", results.getString(1));
-                item.put("SongName", results.getInt(2));
-                Song.add(item);
+                item.put("SongID", SongID);
+                item.put("SongName", results.getString(1));
+                item.put("SongContents", results.getInt(2));
             }
-            return Song.toString();
+            return item.toString();
         } catch (Exception exception) {
             System.out.println("Database error: " + exception.getMessage());
-            return "{\"error\": \"Unable to get Song, please see server console for more info.\"}";
+            return "{\"error\": \"Unable to get item, please see server console for more info.\"}";
         }
     }
 
@@ -162,6 +164,7 @@ public class Users {
             PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET SongName = ? WHERE SongID = ?");
             ps.setString(1, SongName);
             ps.setInt(2, SongID);
+            ps.execute();
             System.out.println("Song successfully renamed to: " + SongName);
         }
         catch (Exception exception) {
@@ -169,51 +172,60 @@ public class Users {
         }
     }
 
-    @POST
+    @GET
     @Path("list/delete/{SongID}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static void deleteUser(@PathParam("SongID") Integer SongID) {
+    public String deleteSong(@PathParam("SongID") Integer SongID) {
         System.out.println("list/delete/" + SongID);
         try {
+            if (SongID == null) {
+                throw new Exception("One or more form data parameters are missing in the HTTP request.");
+            }
+            System.out.println("list/delete/" + SongID);
+
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Songs WHERE SongID = ?");
+
             ps.setInt(1, SongID);
 
             ps.execute();
-            System.out.println("Deletion successful");
-        } catch (SQLException exception) {
-            System.out.println("Database error " + exception.getMessage());
 
+            return "{\"status\": \"OK\"}";
+
+        } catch (Exception exception) {
+            System.out.println("Database error: " + exception.getMessage());
+            return "{\"error\": \"Unable to delete item, please see server console for more info.\"}";
         }
     }
 
 
-    //This is the Login API but I don't know how to do it yet
-    /*@POST
+
+
+    @POST
     @Path("login")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String loginUser(@FormDataParam("UserName") String username, @FormDataParam("Password") String password) {
+    public String loginUser(@FormDataParam("UserName") String UserName, @FormDataParam("Password") String Password, @CookieParam("Token") String Token) {
 
         try {
 
             PreparedStatement ps1 = Main.db.prepareStatement("SELECT Password FROM Users WHERE Username = ?");
-            ps1.setString(1, username);
+            ps1.setString(1, UserName);
             ResultSet loginResults = ps1.executeQuery();
             if (loginResults.next()) {
 
                 String correctPassword = loginResults.getString(1);
 
-                if (password.equals(correctPassword)) {
+                if (Password.equals(correctPassword)) {
 
-                    String token = UUID.randomUUID().toString();
+                    Token = UUID.randomUUID().toString();
 
                     PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Users SET Token = ? WHERE Username = ?");
-                    ps2.setString(1, token);
-                    ps2.setString(2, username);
+                    ps2.setString(1, Token);
+                    ps2.setString(2, UserName);
                     ps2.executeUpdate();
 
-                    return "{\"token\": \""+ token + "\"}";
+                    return "{\"token\": \""+ Token + "\"}";
 
                 } else {
 
@@ -233,7 +245,7 @@ public class Users {
         }
 
 
-    }*/
+    }
 
 
 
