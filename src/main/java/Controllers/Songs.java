@@ -6,10 +6,7 @@ import server.Main;
 
 import javax.annotation.PostConstruct;
 import javax.print.attribute.standard.Media;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,17 +18,16 @@ import java.sql.ResultSet;
 @Path("/song/")
 public class Songs {
     @POST
-    @Path("save")
+    @Path("UserID={UserID}/SongID={SongID}/save") //API path /song/UserID= /SongID= /save
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String saveSong(@FormDataParam("UserID") Integer UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents, @FormDataParam("SongID") Integer SongID) {
+    public String saveSong(@PathParam("UserID") Integer UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents, @PathParam("SongID") Integer SongID) { //Fields required for SQL statements
         try {
-            if (SongID == 0 || UserID == 0 || SongName == null || SongContents == null) {
-                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            if (SongID == 0 || UserID == 0 || SongName == null || SongContents == null) { //Checks if any of the fields are missing/null
+                throw new Exception("One or more form data parameters are missing in the HTTP request"); //if it is returns this error message
             }
-            System.out.println("song/save");
 
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = ?");
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Songs SET UserID = ?, SongName = ?, SongContents = ? WHERE SongID = ?"); //SQL statement
             ps.setInt(1, UserID);
             ps.setString(2, SongName);
             ps.setString(3, SongContents);
@@ -45,10 +41,10 @@ public class Songs {
     }
 
     @POST
-    @Path("newSong")
+    @Path("UserID={UserID}/newSong")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String newSong(@FormDataParam("UserID") Integer UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents) {
+    public String newSong(@PathParam("UserID") Integer UserID, @FormDataParam("SongName") String SongName, @FormDataParam("SongContents") String SongContents) { //Fields required for SQL statements
         try {
             if (UserID == 0 || SongName == null || SongContents == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
