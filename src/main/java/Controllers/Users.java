@@ -17,113 +17,123 @@ import java.util.UUID;
 @Path("/user/")
 public class Users {
     @GET
-    @Path("select")
+    @Path("select") // path "/user/select
     @Produces(MediaType.APPLICATION_JSON)
-    public static String selectUser(@FormDataParam("Username") String UserName) throws Exception {
-        if (UserName == null) {
-            throw new Exception("Users 'UserName' is missing in the HTTP requests URL");
+    public static String selectUser(@FormDataParam("Username") String UserName) throws Exception { //Fields required for SQL statements
+        if (UserName == null) { //Checks if the Username is missing
+            throw new Exception("Users 'UserName' is missing"); //if it is this statement is returned
         }
-        JSONObject item = new JSONObject();
+        JSONObject item = new JSONObject(); //creating a JSON object for the select method
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT UserID, UserName, Password FROM Users WHERE UserName=?");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT UserID, UserName, Password FROM Users WHERE UserName=?"); //SQL statement selects all the information about a user from their username
 
             ps.setString(1, UserName);
             ResultSet results = ps.executeQuery();
-            if (results.next()) {
+            if (results.next()) { //selects one record
                 item.put("UserID",results.getInt(1));
                 item.put("Username", results.getString(2));
-                item.put("Password", results.getString(3));
+                item.put("Password", results.getString(3)); //these add the data into a string
             }
             return item.toString();
 
-        } catch (Exception exception) {
+        } catch (Exception exception) { //catches any errors
             System.out.println("Database error: " + exception.getMessage());
-            return "{\"error\": \"Unable to list users, please see server console for more info.\"}";
+            return "{\"error\": \"Unable to list users, please see server console for more info.\"}"; //JSON error message
         }
 
 
     }
 
     @POST
-    @Path("create")
+    @Path("create") //API path : /user/create
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String createUser(@FormDataParam("UserName") String UserName, @FormDataParam("Password")String Password, @FormDataParam("Admin") Boolean Admin) {
+    public static String createUser(@FormDataParam("UserName") String UserName, @FormDataParam("Password")String Password) { //Fields required for SQL statements
+        if (UserName == null) { //checks if UserName is missing
+            return "{\"error\": \"UserName is missing.\"}"; //returns appropriate message
+        }
+        if (Password == null) { //checks if Password is missing
+            return "{\"error\": \"Password is missing.\"}"; //returns appropriate message
+        }
         try {
-            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Users (UserName, Password, Admin) VALUES (?, ?, ?)");
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Users (UserName, Password) VALUES (?, ?)"); //SQL statements inserts the data and creates a new record in the database
             ps.setString(1, UserName);
             ps.setString(2, Password);
-            ps.setBoolean(3, Admin);
-            ps.executeUpdate();
+            ps.executeUpdate(); //executes the SQL statement
             System.out.println("Record added to 'Users' table");
-            return "{\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}"; //Lets the program know no errors occurred
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
-            System.out.println("Error: Something has gone wrong, Error message: " + exception.getMessage());
-            return "{\"error\": \"Unable to create new user, please see server console for more info.\"}";
+            System.out.println("Error: Something has gone wrong, Error message: " + exception.getMessage()); //Prints that there was an error
+            return "{\"error\": \"Unable to create new user, please see server console for more info.\"}"; //Returns that there was an error
         }
     }
 
     @GET
-    @Path("allUsers")
+    @Path("allUsers") //API path: /user/allUsers
     @Produces(MediaType.APPLICATION_JSON)
-    public static String listUser() {
+    public static String listUser() { //No fields required
         try {
-            JSONArray users = new JSONArray();
-            PreparedStatement ps = Main.db.prepareStatement("SELECT UserID, UserName, Password FROM Users");
+            JSONArray users = new JSONArray(); //creates JSON array to store all of the User records
+            PreparedStatement ps = Main.db.prepareStatement("SELECT UserID, UserName, Password FROM Users"); //SQL that selects all of the User fields and records
 
-            ResultSet results = ps.executeQuery();
-            while (results.next()) {
-                JSONObject user = new JSONObject();
+            ResultSet results = ps.executeQuery(); //executes SQL
+            while (results.next()) { //This loop makes it go through all of the User records until it reaches the end
+                JSONObject user = new JSONObject(); //This object stores the values returned from the SQL statement
                 user.put("UserID",results.getInt(1));
                 user.put("Username", results.getString(2));
                 user.put("Password", results.getString(3));
-                users.add(user);
+                users.add(user); //This then gets added to the JSON array
             }
-            return users.toString();
+            return users.toString(); //Returns the array of Users
         } catch (SQLException exception) {
-            System.out.println("Database error " + exception.getMessage());
-            return "{\"error\": \"Unable to list users, please see server console for more info.\"}";
+            System.out.println("Database error " + exception.getMessage()); //Prints that there was an error
+            return "{\"error\": \"Unable to list users, please see server console for more info.\"}"; //Returns that there was an error
 
         }
     }
 
     @POST
-    @Path("delete")
+    @Path("delete") //API path: /user/delete
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static void deleteUser() {
+    public static void deleteUser(@FormDataParam("UserID") Integer UserID) { //Fields required for SQL statements
+        if (UserID == null) { //Checks if UserID is null
+            System.out.println("Database error: UserID is missing"); //Prints that there was an error
+        }
         try {
-            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Users WHERE UserID =?");
-            ps.setInt(1, 5);
+            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Users WHERE UserID =?"); //SQL deletes the record that matches the userID
+            ps.setInt(1, UserID);
 
-            ps.execute();
-            System.out.println("Deletion successful");
+            ps.execute(); //Executes the SQL
+            System.out.println("Deletion successful"); //Prints that the deletion was successful
         } catch (SQLException exception) {
-            System.out.println("Database error " + exception.getMessage());
-
+            System.out.println("Database error " + exception.getMessage());  //prints the Error message
         }
     }
 
     @POST
-    @Path("list")
+    @Path("list") //API path: /user/list
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String listSongs(@FormDataParam("UserID") Integer UserID) {
+    public String listSongs(@FormDataParam("UserID") Integer UserID) { //Fields required for SQL statements
+        if (UserID == null) { //Checks if UserID is null
+            return "{\"error\": \"Missing UserID.\"}"; //returns JSON message that the UserID is missing
+        }
         try {
-            JSONArray Songs = new JSONArray();
-            PreparedStatement ps = Main.db.prepareStatement("SELECT SongName FROM Songs WHERE UserID=?");
+            JSONArray Songs = new JSONArray(); //Creates the JSON array to store the users songs
+            PreparedStatement ps = Main.db.prepareStatement("SELECT SongName FROM Songs WHERE UserID=?"); //SQL statement selects all of the SongName's of the UserID's songs
             ps.setInt(1,UserID);
-            ResultSet results = ps.executeQuery();
-            while (results.next()) {
+            ResultSet results = ps.executeQuery(); //Executes the SQL statement
+            while (results.next()) { //This loop makes it go through all of the User records until it reaches the end
                 JSONObject item = new JSONObject();
-                item.put("SongName", results.getString(1));
-                Songs.add(item);
+                item.put("SongName", results.getString(1)); //Object stores the SongName
+                Songs.add(item); //This adds the object to an array
             }
-            return Songs.toString();
-        } catch (Exception exception) {
-            System.out.println("Database error: " + exception.getMessage());
-            return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
+            return Songs.toString(); //Returns the JSON array
+        } catch (Exception exception) { //catches error
+            System.out.println("Database error: " + exception.getMessage()); //Prints error message
+            return "{\"error\": \"Unable to list items, please see server console for more info.\"}"; //Returns JSON message stating the issue
         }
     }
 
@@ -131,7 +141,7 @@ public class Users {
     @GET
     @Path("list/load/{SongID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getThing(@PathParam("SongID") Integer SongID) throws Exception {
+    public String getThing(@PathParam("SongID") Integer SongID) throws Exception { //Fields required for SQL statements
         if (SongID == null) {
             throw new Exception("Songs's 'SongID' is missing in the HTTP request's URL.");
         }
@@ -157,7 +167,13 @@ public class Users {
     @POST
     @Path("list/rename/{SongID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public static void renameSong(@PathParam("SongID") Integer SongID, @FormDataParam("SongName") String SongName) {
+    public static void renameSong(@PathParam("SongID") Integer SongID, @FormDataParam("SongName") String SongName) { //Fields required for SQL statements
+        if (SongID == null) {
+            System.out.println("SongID is not found in path");
+        }
+        if (SongName == null) {
+            System.out.println("SongName is missing");
+        }
         System.out.println("list/rename/" + SongID);
         JSONObject item = new JSONObject();
         try {
@@ -176,11 +192,11 @@ public class Users {
     @Path("list/delete/{SongID}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteSong(@PathParam("SongID") Integer SongID) {
+    public String deleteSong(@PathParam("SongID") Integer SongID) { //Fields required for SQL statements
         System.out.println("list/delete/" + SongID);
         try {
             if (SongID == null) {
-                throw new Exception("One or more form data parameters are missing in the HTTP request.");
+                throw new Exception("SongID is missing.");
             }
             System.out.println("list/delete/" + SongID);
 
@@ -205,7 +221,7 @@ public class Users {
     @Path("login")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String loginUser(@FormDataParam("UserName") String UserName, @FormDataParam("Password") String Password, @CookieParam("Token") String Token) {
+    public String loginUser(@FormDataParam("UserName") String UserName, @FormDataParam("Password") String Password, @CookieParam("Token") String Token) { //Fields required for SQL statements
 
         try {
 
